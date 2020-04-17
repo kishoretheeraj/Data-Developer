@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "934513636677",
+    "firebase_url": "https://data-developer.firebaseio.com",
+    "project_id": "data-developer",
+    "storage_bucket": "data-developer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934513636677:android:8dff503ccfb1d14c79ba2c",
+        "android_client_info": {
+          "package_name": "com.example.datadeveloper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "934513636677-12a3926nk7fdh31srcaekursdmgpbqt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6dGNFzGWoz8u4wWLko9JTq4fsKriZuQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "934513636677-12a3926nk7fdh31srcaekursdmgpbqt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,2 @@
+rootProject.name='Data Developer'
+include ':app'
