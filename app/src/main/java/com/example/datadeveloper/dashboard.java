@@ -6,15 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,10 +35,13 @@ public class dashboard extends AppCompatActivity {
     Button logout,verify,resetpassword,changeprofile;
     TextView verifymsg,fname,femail,fphone;
    FirebaseAuth fauth;
-   StorageReference storageReference;
     FirebaseFirestore fstore;
     String userid;
     ImageView imageView;
+    StorageReference storageReference;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,14 +51,14 @@ public class dashboard extends AppCompatActivity {
         fname=findViewById(R.id.textView6);
         femail=findViewById(R.id.textView7);
         resetpassword =findViewById(R.id.resetpassword);
-
         changeprofile=findViewById(R.id.changeprofile);
         fphone=findViewById(R.id.textView8);
         imageView=findViewById(R.id.profile);
+        verify=findViewById(R.id.verifybtn);
+       fauth=FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
-        storageReference= FirebaseStorage.getInstance().getReference();
-
-StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUser().getUid()+"/profile.jpg");
+        StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUser().getUid()+"/profile.jpg");
         profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -62,11 +66,9 @@ StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUs
             }
         });
 
-        verify=findViewById(R.id.verifybtn);
-       fauth=FirebaseAuth.getInstance();
+
         FirebaseUser user=fauth.getCurrentUser();
         fstore=FirebaseFirestore.getInstance();
-
         if(!user.isEmailVerified())
         {
             verifymsg.setVisibility(View.VISIBLE);
@@ -91,8 +93,9 @@ StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUs
                 }
             });
         }
-
         userid=fauth.getCurrentUser().getUid();
+
+
 
         DocumentReference documentReference=fstore.collection("users").document(userid);
         documentReference.addSnapshotListener(dashboard.this, new EventListener<DocumentSnapshot>() {
@@ -108,60 +111,91 @@ StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUs
         changeprofile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent opengallery=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(opengallery,1000);
-                
-
+                // open gallery
+                Intent openGalleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(openGalleryIntent,1000);
 
             }
         });
-
-
-
-
 
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1000)
-        {
-            if(resultCode== Activity.RESULT_OK)
-            {
-                Uri image=data.getData();
-                //imageView.setImageURI(image);
-                uploadimagetofirebase(image);
-                
+        if(requestCode == 1000){
+            if(resultCode == Activity.RESULT_OK){
+                Uri imageUri = data.getData();
+                //   profileImage.setImageURI(imageUri);
+                 uploadImageToFirebase(imageUri);
+
+
             }
         }
+
     }
 
-    private void uploadimagetofirebase(Uri image) {
-        //upload image to firebase storage
+    private void uploadImageToFirebase(Uri imageUri) {
+        // uplaod image to firebase storage
 
-        final StorageReference fileref=storageReference.child("users/"+fauth.getCurrentUser().getUid()+"/profile.jpg");
-        fileref.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+
+        final StorageReference fileRef = storageReference.child("users/"+fauth.getCurrentUser().getUid()+"/profile.jpg");
+/*fileRef.putFile(imageUri)
+        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                Toast.makeText(dashboard.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                Task<Uri> result=taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String photoStringLink=uri.toString();
+                    }
+                });
+            }
+        });*/
+
+        fileRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
                         Picasso.get().load(uri).into(imageView);
+                        StorageReference profileRef = storageReference.child("users/"+fauth.getCurrentUser().getUid()+"/profile.jpg");
+                        profileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Picasso.get().load(uri).into(imageView);
+
+                            }
+                        });
+
                     }
                 });
-                Toast.makeText(dashboard.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(dashboard.this, "Image Upload failed", Toast.LENGTH_SHORT).show();
-                
+                Toast.makeText(dashboard.this, "Failed.", Toast.LENGTH_SHORT).show();
             }
         });
-        
+
+
+
+
+
+
+
+
+
+
     }
+
+
+
 
     public void logout(View view) {
         FirebaseAuth.getInstance().signOut();
