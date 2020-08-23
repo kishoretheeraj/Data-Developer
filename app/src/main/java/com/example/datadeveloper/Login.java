@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
     EditText memail, mpassword;
@@ -30,6 +31,7 @@ public class Login extends AppCompatActivity {
     TextView mcreatebtn, resetmaillink;
     FirebaseAuth fauth;
     ProgressBar progressBar;
+    FirebaseUser user;
 
 
     @Override
@@ -45,6 +47,7 @@ public class Login extends AppCompatActivity {
         mloginbtn = findViewById(R.id.button3);
         mcreatebtn = findViewById(R.id.textView2);
         resetmaillink = findViewById(R.id.textView3);
+
 
 
         mloginbtn.setOnClickListener(new View.OnClickListener() {
